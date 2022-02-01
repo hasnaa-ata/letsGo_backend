@@ -35,8 +35,16 @@ namespace LetsGo.DataLayer.TableEntity
         [Column(Order = 7)]
         public int MaxNoMembers { get; set; }
 
+        [Column(Order = 8)]
+        [StringLength(10)]
+        public string ImageContentType { get; set; }
+
+        [Column(Order = 9)]
+        [StringLength(200)]
+        public string GroupImageURL { get; set; }
 
         public virtual ICollection<UserGroup> UserGroups { get; set; }
+        public virtual ICollection<GroupMedia> GroupMedias { get; set; }
 
         public virtual Routine Routine { get; set; }
         public virtual GroupStatus GroupStatus { get; set; }

@@ -184,7 +184,7 @@ namespace LetsGo.DataLayer.ViewBuilder
             //Create_GroupView
             migrationBuilder.Sql("Create VIEW [GroupView] " +
                "AS " +
-               "SELECT GP.GroupId, UserGroup.UserId, GP.GroupName, GP.GroupAltName, GP.Description, GP.AltDescription, GP.MaxNoMembers, " +
+               "SELECT GP.GroupId, UserGroup.UserId, GP.GroupName, GP.GroupAltName, GP.GroupImageURL, GP.Description, GP.AltDescription, GP.MaxNoMembers, " +
                "GroupStatus.GroupStatusId, GroupStatus.GroupStatusName, GroupStatus.GroupStatusAltName, " +
                "Routine.RoutineId, Routine.RoutineName, Routine.RoutineAltName, " +
                "GP.IsBlock, (CASE WHEN Routine.IsBlock = 1 THEN 'true' ELSE 'false' END) AS IsBlock_str, " +

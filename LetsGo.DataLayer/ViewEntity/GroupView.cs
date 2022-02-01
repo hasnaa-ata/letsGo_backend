@@ -49,5 +49,10 @@ namespace LetsGo.DataLayer.ViewEntity
 
         [Column(Order = 12)]
         public Guid UserId { get; set; }
+
+        [Column(Order = 13)]
+        public string GroupImageURL { get; set; }
+
+
     }
 }

@@ -92,6 +92,7 @@ namespace LetsGo.BackEnd.Models
     public class GroupDetailsViewModel : GroupViewModel
     {
         public IEnumerable<GroupMember> Members { get; set; }
+        public IEnumerable<string> Media { get; set; }
         public Guid GroupAdminId { get; set; }
     }
 

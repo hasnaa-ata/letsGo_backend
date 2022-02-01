@@ -12,6 +12,7 @@ using GenericRepositoryCore.Utilities;
 using DataLayer.Security.TableEntity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
+using PlusAction.BackEnd.Common;
 
 namespace LetsGo.BackEnd.Controllers
 {
@@ -76,36 +77,46 @@ namespace LetsGo.BackEnd.Controllers
 
         public override IActionResult FuncPostDetailsView(bool success, Guid id, ref GroupDetailsViewModel model, Guid? notificationId, ref JsonResponse<GroupDetailsViewModel> response)
         {
-            Guid? userId = Guid.Parse(User.Identity.GetUserId());
+            //Guid? userId = Guid.Parse(User.Identity.GetUserId());
             UserGroupModel<UserGroup> userGroupModel = new UserGroupModel<UserGroup>();
+            GroupMediaModel<GroupMedia> groupMediaModel = new GroupMediaModel<GroupMedia>();
             List<UserGroup> userGroups = userGroupModel.GetData(GroupId: id, IncludeReferences: "Role").ToList();
             List<GroupMember> members = new List<GroupMember>();
             if (userGroups != null && userGroups.Any())
             {
-                foreach (UserGroup gp in userGroups)
+                foreach (UserGroup user_gp in userGroups)
                 {
-                    var friend = _userManager.FindByIdAsync(gp.UserId.ToString()).Result;
+                    var friend = _userManager.FindByIdAsync(user_gp.UserId.ToString()).Result;
                     GroupMember member = CoreUtility.CopyObject<User, GroupMember>(friend);
-                    if(gp.Role.Id == RoleIds.GroupAdmin)
+                    if(user_gp.Role.Id == RoleIds.GroupAdmin)
                     {
                         model.GroupAdminId = member.Id;
                     }
-                    if (friend.Id != userId && !members.Contains(member))
+                    if (!members.Contains(member))
                     {
-                        //if (gp.Role.Id == RoleIds.GroupAdmin)
-                        //{
-                        //    member.GroupRole = "Admin";
-                        //    model.GroupAdminId = member.Id;
-                        //}
-                        //else
-                        //{
-                        //    member.GroupRole = "User";
-                        //}
+                        if (user_gp.Role.Id == RoleIds.GroupAdmin)
+                        {
+                            member.GroupRole = "Admin";
+                        }
+                        else
+                        {
+                            member.GroupRole = "User";
+                        }
                         members.Add(member);
                     }
                 }
             }
             model.Members = members;
+
+            List<GroupMedia> groupMedias = groupMediaModel.GetData(GroupId: id).ToList();
+            List<string> mediaUrls = new List<string>();
+            if (groupMedias != null && groupMedias.Any())
+            {
+                mediaUrls = groupMedias
+                    .Select(m => "http://192.168.1.11:3000/api/group/groupMedia/" + m.GroupMediaId.ToString())
+                    .ToList();
+            }
+            model.Media = mediaUrls;
 
             return base.FuncPostDetailsView(success, id, ref model, notificationId, ref response);
         }
@@ -361,20 +372,20 @@ namespace LetsGo.BackEnd.Controllers
                        });
                 }
             }
-            else
-            {
-                return Unauthorized(
-                   new JsonResponse<bool>()
-                   {
-                       Status = 0,
-                       HttpStatusCode = System.Net.HttpStatusCode.Unauthorized,
-                       Result = false,
-                       Errors = new List<String>() {
-                        "Unauthorized"
-                       },
-                       Message = "Unauthorized"
-                   });
-            }
+            //else
+            //{
+            //    return Unauthorized(
+            //       new JsonResponse<bool>()
+            //       {
+            //           Status = 0,
+            //           HttpStatusCode = System.Net.HttpStatusCode.Unauthorized,
+            //           Result = false,
+            //           Errors = new List<String>() {
+            //            "Unauthorized"
+            //           },
+            //           Message = "Unauthorized"
+            //       });
+            //}
 
             var model = userGroupModel.GetData(GroupId: groupId, UserId: currentUserId).FirstOrDefault();
             if (model != null)
@@ -415,6 +426,193 @@ namespace LetsGo.BackEnd.Controllers
                         Message = "couldn't find user"
                     });
             }
+        }
+
+        [AllowAnonymous]
+        [HttpGet("groupImage/{groupId}")]
+        public IActionResult ImageAsync(Guid groupId)
+        {
+            GroupModel<Group> groupModel = new GroupModel<Group>();
+            Group group = groupModel.Get(groupId);
+            string path = group.GroupImageURL;
+            string contentType = group.ImageContentType;
+            var image = System.IO.File.OpenRead(path);
+            return File(image, contentType);
+        }
+
+        [AllowAnonymous]
+        [HttpGet("groupMedia/{mediaId}")]
+        public IActionResult GroupMediaAsync(Guid mediaId)
+        {
+            GroupMediaModel<GroupMedia> groupMediaModel = new GroupMediaModel<GroupMedia>();
+            GroupMedia groupMedia = groupMediaModel.GetData(GroupMediaId: mediaId).FirstOrDefault();
+            if (groupMedia == null)
+            {
+                return NotFound();
+            }
+            string path = groupMedia.GroupMediaURL;
+            string contentType = groupMedia.ContentType;
+            var image = System.IO.File.OpenRead(path);
+            return File(image, contentType);
+        }
+
+        [HttpPost("addGroupMedia")]
+        [Authorize]
+        public IActionResult AddGroupMedia([FromHeader(Name = "groupId")] Guid groupId, UploadedDocument uploadedDocument)
+        {
+            Guid currentUserId = Guid.Parse(User.Identity.GetUserId());
+            if (uploadedDocument.ContentType == "mp4")
+            {
+                return BadRequest(new JsonResponse<bool>()
+                {
+                    Errors = new List<string> {
+                    "No videos allowed"
+                    },
+                    Status = 0,
+                    Result = false,
+                    HttpStatusCode = System.Net.HttpStatusCode.BadRequest,
+                    Message = "No videos allowed"
+                });
+            }
+            GroupModel<Group> groupModel = new GroupModel<Group>();
+            Group group = groupModel.Get(groupId);
+
+            if (group == null)
+            {
+                return BadRequest(new JsonResponse<bool>()
+                {
+                    Errors = new List<string> {
+                    "Group not found"
+                    },
+                    Status = 0,
+                    Result = false,
+                    HttpStatusCode = System.Net.HttpStatusCode.BadRequest,
+                    Message = "Group not found"
+                });
+            }
+            string errorMessage = "";
+            String fileName = DateTime.Now.ToString("dd-MM-yyyy_HH-mm-ss-ffff");
+            string imagePath = UploadDocument(uploadedDocument,fileName, "App_Data/Images/GroupMedia/" + groupId.ToString(), ref errorMessage);
+            if (imagePath == null)
+            {
+                return BadRequest(new JsonResponse<bool>()
+                {
+                    Errors = new List<string> {
+                    errorMessage
+                    },
+                    Status = 0,
+                    Result = false,
+                    Message = "Could not save image"
+                });
+            }
+
+            GroupMediaModel<GroupMedia> groupMediaModel = new GroupMediaModel<GroupMedia>();
+
+            var newGroupMedia = groupMediaModel.Insert(new GroupMedia()
+            {
+                CreateDate = DateTime.Now,
+                CreateUserId = currentUserId,
+                ContentType = uploadedDocument.ContentType,
+                GroupMediaURL = imagePath,
+                GroupId = groupId,
+                IsBlock = false,
+                IsDeleted = false,
+            });
+
+            if (newGroupMedia == null)
+            {
+                return BadRequest(new JsonResponse<bool>()
+                {
+                    Errors = new List<string> {
+                    "Couldn't add image"
+                    },
+                    Status = 0,
+                    Result = false,
+                    Message = "Couldn't add image"
+                });
+            }
+
+            return Ok(new JsonResponse<bool>()
+            {
+                Errors = new List<string> {
+                    "image added successfully"
+                    },
+                Status = 1,
+                Result = true,
+                Message = "image added successfully",
+            });
+        }
+
+        
+        [HttpPost("updateGroupImage")]
+        [Authorize]
+        public IActionResult UpdateGroupImage([FromHeader(Name = "groupId")] Guid groupId, UploadedDocument uploadedDocument)
+        {
+            GroupModel<Group> groupModel = new GroupModel<Group>();
+            Group group = groupModel.Get(groupId);
+
+            if (group == null)
+            {
+                return BadRequest(new JsonResponse<bool>()
+                {
+                    Errors = new List<string> {
+                    "Group not found"
+                    },
+                    Status = 0,
+                    Result = false,
+                    HttpStatusCode = System.Net.HttpStatusCode.BadRequest,
+                    Message = "User not found"
+                });
+            }
+            string errorMessage = "";
+            string imagePath = UploadDocument(uploadedDocument, groupId.ToString(), "App_Data/Images/GroupProfilePictures", ref errorMessage);
+            if (imagePath == null)
+            {
+                return BadRequest(new JsonResponse<bool>()
+                {
+                    Errors = new List<string> {
+                    errorMessage
+                    },
+                    Status = 0,
+                    Result = false,
+                    Message = "Could not save image"
+                });
+            }
+
+            group.GroupImageURL = imagePath;
+            group.ImageContentType = uploadedDocument.ContentType;
+
+            Group updatedGroup = groupModel.Update(groupId, group);
+            if(updatedGroup == null)
+            {
+                return BadRequest(new JsonResponse<bool>()
+                {
+                    Errors = new List<string> {
+                    "Couldn't update group"
+                    },
+                    Status = 0,
+                    Result = false,
+                    Message = "Couldn't update group"
+                });
+            }
+
+            return Ok(new JsonResponse<bool>()
+            {
+                Status = 1,
+                Result = true,
+                Message = "image updated successfully",
+            });
+        }
+
+        private string UploadDocument(UploadedDocument uploadedDocument, string fileName, string folderPath, ref string errorMessage)
+        {
+            bool isValid = Classes.Utilities.Utility.ValidateUploadedDocument(uploadedDocument.ContentType, uploadedDocument.FileSize, ref errorMessage);
+            if (isValid)
+            {
+                string filePath = Classes.Utilities.Utility.saveFile(fileName, folderPath, uploadedDocument);
+                return filePath;
+            }
+            return null;
         }
     }
 }

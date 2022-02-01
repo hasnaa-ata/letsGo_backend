@@ -261,6 +261,7 @@ namespace LetsGo.DataLayer
         public virtual DbSet<City> Cities { get; set; }
         public virtual DbSet<UserGroup> UserGroups { get; set; }
         public virtual DbSet<RoutineDay> RoutineDays { get; set; }
+        public virtual DbSet<GroupMedia> GroupMedias { get; set; }
 
         #endregion
 
