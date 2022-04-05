@@ -2,7 +2,7 @@
 
 namespace LetsGo.DataLayer.Migrations
 {
-    public partial class _createViews : Migration
+    public partial class createViews : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -181,15 +181,17 @@ namespace LetsGo.DataLayer.Migrations
             //Create_GroupView
             migrationBuilder.Sql("Create VIEW [GroupView] " +
                "AS " +
-               "SELECT GP.GroupId, GP.GroupName, GP.GroupAltName, GP.Description, GP.AltDescription, GP.MaxNoMembers, " +
+               "SELECT GP.GroupId, UserGroup.UserId, GP.GroupName, GP.GroupAltName, GP.GroupImageURL, GP.Description, GP.AltDescription, GP.MaxNoMembers, " +
                "GroupStatus.GroupStatusId, GroupStatus.GroupStatusName, GroupStatus.GroupStatusAltName, " +
                "Routine.RoutineId, Routine.RoutineName, Routine.RoutineAltName, " +
                "GP.IsBlock, (CASE WHEN Routine.IsBlock = 1 THEN 'true' ELSE 'false' END) AS IsBlock_str, " +
                "GP.IsDeleted, GP.CreateUserId, GP.CreateDate, GP.ModifyUserId, GP.ModifyDate,  " +
                "CreateUser.UserFullName AS CreateUser_FullName, CreateUser.UserAltFullName AS CreateUser_FullAltName, " +
                "ModifyUser.UserFullName AS ModifyUser_FullName, ModifyUser.UserAltFullName AS ModifyUser_FullAltName " +
-               "From [dbo].[Group] AS GP INNER JOIN[dbo].Routine AS Routine " +
-               "ON GP.RoutineId = Routine.RoutineId LEFT OUTER JOIN[dbo].GroupStatus AS GroupStatus " +
+               "From [dbo].[Group] AS GP INNER JOIN [dbo].Routine AS Routine " +
+               "ON GP.RoutineId = Routine.RoutineId INNER JOIN [dbo].UserGroup AS UserGroup " +
+               "ON GP.GroupId = UserGroup.GroupId and UserGroup.IsDeleted = 0 " +
+               "LEFT OUTER JOIN [dbo].GroupStatus AS GroupStatus " +
                "ON GP.GroupStatusId = GroupStatus.GroupStatusId LEFT OUTER JOIN " +
                "[security].[UserInfoView] AS CreateUser ON GP.CreateUserId = CreateUser.UserId LEFT OUTER JOIN " +
                "[security].[UserInfoView] AS ModifyUser ON GP.ModifyUserId = ModifyUser.UserId");

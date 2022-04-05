@@ -11,6 +11,7 @@ using GenericRepositoryCore.Utilities;
 using Microsoft.AspNetCore.Identity;
 using DataLayer.Security.TableEntity;
 using Microsoft.AspNetCore.Authorization;
+using static GenericBackEndCore.Classes.Common.Enums;
 
 namespace LetsGo.BackEnd.Controllers
 {
@@ -25,7 +26,7 @@ namespace LetsGo.BackEnd.Controllers
 
         public RoutineController(UserManager<User> userManager)
         {
-            this._userManager = userManager;
+            _userManager = userManager;
         }
 
         public override bool FuncPreGetGridView(ref GenericDataFormat options, ref JsonResponse<PaginationResult<object>> response)
@@ -64,7 +65,81 @@ namespace LetsGo.BackEnd.Controllers
             }
             return base.FuncPostInitEditView(id, ref model, notificationId, taskId, ref response);
         }
+        
+        public override IActionResult FuncPostEdit(bool success, ref RoutineEditBindModel model, ref Routine updatedItem, Guid? notificationId, Guid? taskId, ref JsonResponse<Routine> response)
+        {
+            return base.FuncPostEdit(success, ref model, ref updatedItem, notificationId, taskId, ref response);
+        }
 
+        //public override IActionResult Edit([FromRoute] Guid id, [FromBody] RoutineEditBindModel model, [FromRoute] Guid? notificationId, [FromRoute] Guid? taskId)
+        //{
+        //    JsonResponse<Routine> response = new JsonResponse<Routine>();
+        //    GrantPermission = UserHasPermission(AccessType.Edit);
+        //    if (GrantPermission)
+        //    {
+        //        List<RoutineDay> addedRoutineDays = new List<RoutineDay>();
+        //        List<RoutineDay> deletedRoutineDays = new List<RoutineDay>();
+        //        List<RoutineDay> editedRoutineDays = new List<RoutineDay>();
+        //        //get new
+        //        addedRoutineDays = model.RoutineDays.Where(x => x.RoutineDayId == null || x.RoutineDayId == Guid.Empty).ToList();
+
+        //        List<RoutineDay> oldRoutineDays = new RoutineDayModel<RoutineDay>().GetData(RoutineId: id).ToList();
+        //        if (ModelState.IsValid)
+        //        {
+        //            DelegatePreEdit delegatePreExecute = new DelegatePreEdit(FuncPreEdit);
+        //            //select routine with days
+        //            if (delegatePreExecute(id, ref model, ref response))
+        //            {
+
+        //                //create instance to update object
+        //                RoutineModel<Routine> instance = new RoutineModel<Routine>();
+        //                Routine updatedItem = null;
+        //                if (IsEdit_WithReference)
+        //                {
+        //                    updatedItem = instance.Update_WithReference(id, model, EntityReferences);
+        //                }
+        //                else
+        //                {
+        //                    updatedItem = instance.Update(id, model);
+        //                }
+        //                bool success = (updatedItem != null);
+
+        //                if (success)
+        //                {
+        //                    //get deleted alarms
+        //                    deletedRoutineDays = oldRoutineDays.Where(x => updatedItem.RoutineDays.Any(y => y.RoutineDayId == x.RoutineDayId && y.IsDeleted)).ToList();
+        //                    //deletedRoutineDays = oldRoutineDays.Where(x => !updatedItem.RoutineDays.Any(y => y.RoutineDayId == x.RoutineDayId)).ToList();
+        //                    //get uppdated
+        //                    editedRoutineDays = updatedItem.RoutineDays.Where(x => oldRoutineDays.Any(y => y.RoutineDayId == x.RoutineDayId && y.FromTime != x.FromTime)).ToList();
+        //                }
+
+        //                DelegatePostEdit delegatePostExecute = new DelegatePostEdit(FuncPostEdit);
+        //                delegatePostExecute(success, ref model, ref updatedItem, notificationId, taskId, ref response);
+        //                if (success)
+        //                {
+        //                    RoutineAlarm routineAlarm = new RoutineAlarm()
+        //                    {
+        //                        AlarmsToAdd = addedRoutineDays,
+        //                        AlarmsToDelete = deletedRoutineDays,
+        //                        AlarmsToEdit = editedRoutineDays,
+        //                    };
+        //                    JsonResponse<RoutineAlarm> newResponse = new JsonResponse<RoutineAlarm>()
+        //                    {
+        //                        Errors = response.Errors,
+        //                        HttpStatusCode = response.HttpStatusCode,
+        //                        Message = response.Message,
+        //                        RedirectTo = response.RedirectTo,
+        //                        Result = routineAlarm,
+        //                        Status = response.Status
+        //                    };
+
+        //                    return Ok(newResponse);
+        //                }
+        //            }
+        //        }
+        //    }
+        //    return GetUnAuthorized();
+        //}
         public override bool FuncPreEdit(Guid id, ref RoutineEditBindModel model, ref JsonResponse<Routine> response)
         {
             IsEdit_WithReference = true;
@@ -73,7 +148,7 @@ namespace LetsGo.BackEnd.Controllers
             IEnumerable<Routine> oldModels = routineModel.GetData(RoutineId: id, IncludeReferences: "RoutineDays");
             if (oldModels != null && oldModels.Any())
             {
-                //get customer branch old status
+                //get Routine old status
                 Routine oldModel = oldModels.SingleOrDefault();
                 if (oldModel != null)
                 {
@@ -100,8 +175,8 @@ namespace LetsGo.BackEnd.Controllers
                             routineDay.CreateUserId = Guid.Parse(User.Identity.GetUserId());
                         }
                         //loop over items that exist in old model items (search by id)
-                        foreach (RoutineDay routineDay in model.RoutineDays.Where(x => oldModel.RoutineDays.Any(y =>
-                      y.RoutineDayId.ToString() == x.RoutineDayId.ToString())))
+                        foreach (RoutineDay routineDay in model.RoutineDays.Where(x => oldModel.RoutineDays
+                        .Any(y => y.RoutineDayId.ToString() == x.RoutineDayId.ToString())))
                         {
                             //get old item
                             var oldRoutineDay = oldModel.RoutineDays.SingleOrDefault(x =>
@@ -194,5 +269,30 @@ namespace LetsGo.BackEnd.Controllers
             }
 
         }
+
+        //public override IActionResult FuncPostDelete(bool success, Guid id, Guid? notificationId, Guid? taskId, ref JsonResponse<bool> response)
+        //{
+        //    if (success)
+        //    {
+        //        //get routine days
+        //        List<RoutineDay> routineDays = new RoutineDayModel<RoutineDay>().GetData(RoutineId: id).ToList();
+        //        JsonResponse<List<RoutineDay>> newResponse = new JsonResponse<List<RoutineDay>>() 
+        //        {
+        //            Errors = response.Errors,
+        //            HttpStatusCode = response.HttpStatusCode,
+        //            Message = response.Message,
+        //            RedirectTo = response.RedirectTo,
+        //            Result = routineDays,
+        //            Status = response.Status
+        //        };
+
+        //        return FuncPostAction<List<RoutineDay>>(success, Transactions.Delete, 1, notificationId, taskId, ref newResponse, routineDays);
+        //    }
+        //    else
+        //    {
+        //        response.Message = MessageResource.ErrorMsg_ItemNotFound;
+        //        return NotFound(response);
+        //    }
+        //}
     }
 }

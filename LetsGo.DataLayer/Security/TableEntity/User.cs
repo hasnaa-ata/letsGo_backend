@@ -72,6 +72,7 @@ namespace DataLayer.Security.TableEntity
         public virtual ICollection<UserLogin> UserLogins { get; set; }
         public virtual ICollection<UserRole> UserRoles { get; set; }
         public virtual ICollection<UserToken> UserTokens { get; set; }
+        public virtual ICollection<FirebaseToken> FirebaseTokens { get; set; }
         public virtual ICollection<UserService> UserServices { get; set; }
         public virtual ICollection<UserServiceAccess> UserServiceAccesses { get; set; }
         public virtual ICollection<Routine> Routines { get; set; }

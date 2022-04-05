@@ -13,6 +13,11 @@ using DataLayer.Security.TableEntity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using PlusAction.BackEnd.Common;
+using System.Net;
+using Newtonsoft.Json;
+using LetsGo.BackEnd.Utilities;
+using System.IO;
+using Microsoft.Extensions.Configuration;
 
 namespace LetsGo.BackEnd.Controllers
 {
@@ -23,10 +28,12 @@ namespace LetsGo.BackEnd.Controllers
      GroupModel<Group>, GroupModel<GroupView>>
     {
         private readonly UserManager<User> _userManager;
+        private readonly IConfiguration _configuration;
 
-        public GroupController(UserManager<User> userManager)
+        public GroupController(UserManager<User> userManager, IConfiguration configuration)
         {
-            this._userManager = userManager;
+            _userManager = userManager;
+            _configuration = configuration;
         }
 
         public override IActionResult FuncPostInitCreateView(ref GroupCreateModel model, Guid? notificationId, Guid? taskId, ref JsonResponse<GroupCreateModel> response)
@@ -112,10 +119,15 @@ namespace LetsGo.BackEnd.Controllers
             List<string> mediaUrls = new List<string>();
             if (groupMedias != null && groupMedias.Any())
             {
+                //mediaUrls = groupMedias
+                //    .Select(m => _configuration["AppUrl"] + "/api/group/groupMedia/" + m.GroupMediaId.ToString())
+                //    .ToList();
+
                 mediaUrls = groupMedias
-                    .Select(m => "http://192.168.1.11:3000/api/group/groupMedia/" + m.GroupMediaId.ToString())
+                    .Select(m => "http://192.168.56.1:3000/api/group/groupMedia/" + m.GroupMediaId.ToString())
                     .ToList();
             }
+
             model.Media = mediaUrls;
 
             return base.FuncPostDetailsView(success, id, ref model, notificationId, ref response);
@@ -123,9 +135,7 @@ namespace LetsGo.BackEnd.Controllers
 
         [HttpGet("addFriends/{groupId}")]
         [Authorize]
-        public IActionResult AddFriendsToGroup( Guid groupId,
-            [FromQuery(Name = "userIds")] List<Guid> userIds
-            )
+        public IActionResult AddFriendsToGroup(Guid groupId, [FromQuery(Name = "userIds")] List<Guid> userIds)
         {
             Guid currentUserId = Guid.Parse(User.Identity.GetUserId());
             UserGroupModel<UserGroup> userGroupModel = new UserGroupModel<UserGroup>();
@@ -195,7 +205,7 @@ namespace LetsGo.BackEnd.Controllers
                    new JsonResponse<bool>()
                    {
                        Status = 0,
-                       HttpStatusCode = System.Net.HttpStatusCode.Unauthorized,
+                       HttpStatusCode = HttpStatusCode.Unauthorized,
                        Result = false,
                        Errors = new List<String>() {
                         "Unauthorized"
@@ -244,6 +254,7 @@ namespace LetsGo.BackEnd.Controllers
                 IsBlock = false,
                 IsDeleted = false,
             };
+
             var model = userGroupModel.Insert(userGroups);
             if (model != null)
             {
@@ -492,7 +503,7 @@ namespace LetsGo.BackEnd.Controllers
             }
             string errorMessage = "";
             String fileName = DateTime.Now.ToString("dd-MM-yyyy_HH-mm-ss-ffff");
-            string imagePath = UploadDocument(uploadedDocument,fileName, "App_Data/Images/GroupMedia/" + groupId.ToString(), ref errorMessage);
+            string imagePath = UploadDocument(uploadedDocument,fileName, _configuration["GroupMediaPath"] + groupId.ToString(), ref errorMessage);
             if (imagePath == null)
             {
                 return BadRequest(new JsonResponse<bool>()
@@ -565,7 +576,7 @@ namespace LetsGo.BackEnd.Controllers
                 });
             }
             string errorMessage = "";
-            string imagePath = UploadDocument(uploadedDocument, groupId.ToString(), "App_Data/Images/GroupProfilePictures", ref errorMessage);
+            string imagePath = UploadDocument(uploadedDocument, groupId.ToString(), _configuration["GroupProfilePicturePath"], ref errorMessage);
             if (imagePath == null)
             {
                 return BadRequest(new JsonResponse<bool>()
@@ -614,5 +625,6 @@ namespace LetsGo.BackEnd.Controllers
             }
             return null;
         }
+
     }
 }

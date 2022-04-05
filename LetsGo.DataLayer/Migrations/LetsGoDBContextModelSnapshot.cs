@@ -281,6 +281,10 @@ namespace LetsGo.DataLayer.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
 
+                    b.Property<string>("ImageContentType")
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
                     b.Property<string>("ImageURL")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
@@ -781,6 +785,52 @@ namespace LetsGo.DataLayer.Migrations
                     b.ToTable("Country");
                 });
 
+            modelBuilder.Entity("LetsGo.DataLayer.TableEntity.FirebaseToken", b =>
+                {
+                    b.Property<Guid>("FirebaseTokenId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<Guid>("CreateUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsBlock")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ModifyDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<Guid?>("ModifyUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Platform")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("FirebaseTokenId");
+
+                    b.HasIndex("Token")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("FirebaseToken");
+                });
+
             modelBuilder.Entity("LetsGo.DataLayer.TableEntity.Group", b =>
                 {
                     b.Property<Guid>("GroupId")
@@ -805,6 +855,10 @@ namespace LetsGo.DataLayer.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
+                    b.Property<string>("GroupImageURL")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
                     b.Property<string>("GroupName")
                         .IsRequired()
                         .HasMaxLength(250)
@@ -812,6 +866,10 @@ namespace LetsGo.DataLayer.Migrations
 
                     b.Property<Guid>("GroupStatusId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ImageContentType")
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<bool>("IsBlock")
                         .HasColumnType("bit");
@@ -838,6 +896,50 @@ namespace LetsGo.DataLayer.Migrations
                     b.HasIndex("RoutineId");
 
                     b.ToTable("Group");
+                });
+
+            modelBuilder.Entity("LetsGo.DataLayer.TableEntity.GroupMedia", b =>
+                {
+                    b.Property<Guid>("GroupMediaId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<Guid>("CreateUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("GroupId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("GroupMediaURL")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<bool>("IsBlock")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ModifyDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<Guid?>("ModifyUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("GroupMediaId");
+
+                    b.HasIndex("GroupId");
+
+                    b.ToTable("GroupMedia");
                 });
 
             modelBuilder.Entity("LetsGo.DataLayer.TableEntity.GroupStatus", b =>
@@ -1086,6 +1188,11 @@ namespace LetsGo.DataLayer.Migrations
                     b.Property<Guid?>("ModifyUserId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int>("NotificationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
                     b.Property<Guid>("RoutineId")
                         .HasColumnType("uniqueidentifier");
 
@@ -1093,6 +1200,9 @@ namespace LetsGo.DataLayer.Migrations
                         .HasColumnType("time");
 
                     b.HasKey("RoutineDayId");
+
+                    b.HasIndex("NotificationId")
+                        .IsUnique();
 
                     b.HasIndex("RoutineId");
 
@@ -1308,6 +1418,9 @@ namespace LetsGo.DataLayer.Migrations
                     b.Property<string>("GroupAltName")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("GroupImageURL")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("GroupName")
                         .HasColumnType("nvarchar(max)");
 
@@ -1352,6 +1465,9 @@ namespace LetsGo.DataLayer.Migrations
 
                     b.Property<string>("RoutineName")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("GroupId");
 
@@ -2140,6 +2256,17 @@ namespace LetsGo.DataLayer.Migrations
                     b.Navigation("State");
                 });
 
+            modelBuilder.Entity("LetsGo.DataLayer.TableEntity.FirebaseToken", b =>
+                {
+                    b.HasOne("DataLayer.Security.TableEntity.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("LetsGo.DataLayer.TableEntity.Group", b =>
                 {
                     b.HasOne("LetsGo.DataLayer.TableEntity.GroupStatus", "GroupStatus")
@@ -2149,7 +2276,7 @@ namespace LetsGo.DataLayer.Migrations
                         .IsRequired();
 
                     b.HasOne("LetsGo.DataLayer.TableEntity.Routine", "Routine")
-                        .WithMany()
+                        .WithMany("Groups")
                         .HasForeignKey("RoutineId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -2157,6 +2284,17 @@ namespace LetsGo.DataLayer.Migrations
                     b.Navigation("GroupStatus");
 
                     b.Navigation("Routine");
+                });
+
+            modelBuilder.Entity("LetsGo.DataLayer.TableEntity.GroupMedia", b =>
+                {
+                    b.HasOne("LetsGo.DataLayer.TableEntity.Group", "Group")
+                        .WithMany("GroupMedias")
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Group");
                 });
 
             modelBuilder.Entity("LetsGo.DataLayer.TableEntity.Invitation", b =>
@@ -2316,6 +2454,8 @@ namespace LetsGo.DataLayer.Migrations
 
             modelBuilder.Entity("LetsGo.DataLayer.TableEntity.Group", b =>
                 {
+                    b.Navigation("GroupMedias");
+
                     b.Navigation("UserGroups");
                 });
 
@@ -2326,6 +2466,8 @@ namespace LetsGo.DataLayer.Migrations
 
             modelBuilder.Entity("LetsGo.DataLayer.TableEntity.Routine", b =>
                 {
+                    b.Navigation("Groups");
+
                     b.Navigation("RoutineDays");
                 });
 

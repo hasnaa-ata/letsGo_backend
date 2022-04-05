@@ -5,6 +5,7 @@ using LetsGo.DataLayer.ViewEntity;
 using Mawid.DataLayer.ViewEntity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -69,6 +70,15 @@ namespace LetsGo.DataLayer
             modelBuilder.Entity<GroupStatus>().HasIndex(e => new { e.GroupStatusAltName }).IsUnique();
             modelBuilder.Entity<AccessType>().HasIndex(e => new { e.AccessTypeName }).IsUnique();
             modelBuilder.Entity<AccessType>().HasIndex(e => new { e.AccessTypeAltName }).IsUnique();
+
+            modelBuilder.Entity<RoutineDay>().Property(e => e.NotificationId).ValueGeneratedOnAdd();
+            modelBuilder.Entity<RoutineDay>().HasIndex(e => e.NotificationId).IsUnique();
+            modelBuilder.Entity<RoutineDay>().Property(u => u.NotificationId)
+                .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
+
+            modelBuilder.Entity<FirebaseToken>().HasIndex(e => e.Token).IsUnique();
+
+            //modelBuilder.Entity<RoutineDay>().HasAlternateKey(e => new { e.NotificationId });
         }
 
 
@@ -262,6 +272,7 @@ namespace LetsGo.DataLayer
         public virtual DbSet<UserGroup> UserGroups { get; set; }
         public virtual DbSet<RoutineDay> RoutineDays { get; set; }
         public virtual DbSet<GroupMedia> GroupMedias { get; set; }
+        public virtual DbSet<FirebaseToken> FirebaseTokens { get; set; }
 
         #endregion
 

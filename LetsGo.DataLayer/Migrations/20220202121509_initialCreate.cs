@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace LetsGo.DataLayer.Migrations
 {
-    public partial class _initialCreate : Migration
+    public partial class initialCreate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -328,6 +328,7 @@ namespace LetsGo.DataLayer.Migrations
                     CityId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     JobTitle = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
                     WorkPlace = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
+                    ImageContentType = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
                     IsBlock = table.Column<bool>(type: "bit", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     CreateUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -353,6 +354,33 @@ namespace LetsGo.DataLayer.Migrations
                         column: x => x.CityId,
                         principalTable: "City",
                         principalColumn: "CityId",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "FirebaseToken",
+                columns: table => new
+                {
+                    FirebaseTokenId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Token = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    Platform = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    IsBlock = table.Column<bool>(type: "bit", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreateUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateDate = table.Column<DateTime>(type: "datetime", nullable: false),
+                    ModifyUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ModifyDate = table.Column<DateTime>(type: "datetime", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FirebaseToken", x => x.FirebaseTokenId);
+                    table.ForeignKey(
+                        name: "FK_FirebaseToken_User_UserId",
+                        column: x => x.UserId,
+                        principalSchema: "security",
+                        principalTable: "User",
+                        principalColumn: "UserId",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -583,6 +611,8 @@ namespace LetsGo.DataLayer.Migrations
                     AltDescription = table.Column<string>(type: "nvarchar(350)", maxLength: 350, nullable: true),
                     GroupStatusId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     MaxNoMembers = table.Column<int>(type: "int", nullable: false),
+                    ImageContentType = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
+                    GroupImageURL = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
                     IsBlock = table.Column<bool>(type: "bit", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     CreateUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -616,6 +646,8 @@ namespace LetsGo.DataLayer.Migrations
                     FromTime = table.Column<TimeSpan>(type: "time", nullable: false),
                     ToTime = table.Column<TimeSpan>(type: "time", nullable: false),
                     RoutineId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    NotificationId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     IsBlock = table.Column<bool>(type: "bit", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     CreateUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -631,6 +663,32 @@ namespace LetsGo.DataLayer.Migrations
                         column: x => x.RoutineId,
                         principalTable: "Routine",
                         principalColumn: "RoutineId",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "GroupMedia",
+                columns: table => new
+                {
+                    GroupMediaId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    GroupId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ContentType = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
+                    GroupMediaURL = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    IsBlock = table.Column<bool>(type: "bit", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreateUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateDate = table.Column<DateTime>(type: "datetime", nullable: false),
+                    ModifyUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ModifyDate = table.Column<DateTime>(type: "datetime", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GroupMedia", x => x.GroupMediaId);
+                    table.ForeignKey(
+                        name: "FK_GroupMedia_Group_GroupId",
+                        column: x => x.GroupId,
+                        principalTable: "Group",
+                        principalColumn: "GroupId",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -728,6 +786,17 @@ namespace LetsGo.DataLayer.Migrations
                 column: "StateId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_FirebaseToken_Token",
+                table: "FirebaseToken",
+                column: "Token",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FirebaseToken_UserId",
+                table: "FirebaseToken",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Group_GroupStatusId",
                 table: "Group",
                 column: "GroupStatusId");
@@ -736,6 +805,11 @@ namespace LetsGo.DataLayer.Migrations
                 name: "IX_Group_RoutineId",
                 table: "Group",
                 column: "RoutineId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GroupMedia_GroupId",
+                table: "GroupMedia",
+                column: "GroupId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_GroupStatus_GroupStatusAltName",
@@ -816,6 +890,12 @@ namespace LetsGo.DataLayer.Migrations
                 name: "IX_RoutineCategory_RoutineCategoryName",
                 table: "RoutineCategory",
                 column: "RoutineCategoryName",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RoutineDay_NotificationId",
+                table: "RoutineDay",
+                column: "NotificationId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -919,6 +999,12 @@ namespace LetsGo.DataLayer.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "FirebaseToken");
+
+            migrationBuilder.DropTable(
+                name: "GroupMedia");
+
             migrationBuilder.DropTable(
                 name: "Invitation");
 

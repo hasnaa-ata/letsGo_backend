@@ -8,10 +8,8 @@ using LetsGo.DataLayer.ViewEntity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using static GenericBackEndCore.Classes.Common.DBEnums;
 
 namespace LetsGo.BackEnd.Controllers
 {
@@ -24,7 +22,7 @@ namespace LetsGo.BackEnd.Controllers
         private readonly UserManager<User> _userManager;
         public InvitationController(UserManager<User> userManager)
         {
-            this._userManager = userManager;
+            _userManager = userManager;
         }
 
         [HttpPost("add")]
@@ -51,6 +49,7 @@ namespace LetsGo.BackEnd.Controllers
 
                 return base.Create(item, notificationId, taskId);
             }
+
             var result = new GenericBackEndCore.Classes.Utilities.JsonResponse<bool>()
             {
                 Result = false,

@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using Classes.Common;
 using DataLayer.Common;
+using LetsGo.BackEnd.Utilities;
+using Newtonsoft.Json;
 using PlusAction.BackEnd.Common;
 
 namespace Classes.Utilities
@@ -153,6 +156,40 @@ namespace Classes.Utilities
             return FilePath;
         }
 
+        public static NotificationResponse SendFirebaseNotification(NotificationRequestBody request)
+        {
+            request.priority = "high";
+            request.notification.android_channel_id = "lets_go_notification_channel";
+            NotificationResponse deserializedData = new NotificationResponse();
+            try
+            {
+                using (WebClient client = new WebClient())
+                {
+                    client.Headers[HttpRequestHeader.ContentType] = "application/json";
+                    client.Headers[HttpRequestHeader.Authorization] = "key=AAAAQnQkYdI:APA91bGePkdr_2XIyPu5P1g35WnwMuqeWAZ3lWl1e5w74cHwtdIGhuZy9-NF1U8CG_7NwVzXz-3BDS_RFXk9KMsABIUXHTcnxRGPgSZYuCxX4E2LWsIckQ0tLlP2Y0lgXB_r1HZ4fTd2";
+                    string body = JsonConvert.SerializeObject(request);
+                    string svcdata = client.UploadString("https://fcm.googleapis.com/fcm/send", "POST", body);
+                    deserializedData = JsonConvert.DeserializeObject<NotificationResponse>(svcdata);
+                }
+            }
+            catch (WebException ex)
+            {
+                if (ex.Response != null)
+                {
+                    string response = new StreamReader(ex.Response.GetResponseStream()).ReadToEnd();
+                    deserializedData = JsonConvert.DeserializeObject<NotificationResponse>(response);
+                }
+                else
+                {
+                    Dictionary<string, dynamic> errorDictionary = new Dictionary<string, dynamic>();
+                    errorDictionary.Add("error", "no response from firebase");
+                    deserializedData.failure = 1;
+                    deserializedData.success = 0;
+                    deserializedData.results = new List<Dictionary<string, dynamic>>() { errorDictionary };
+                }
+            }
+            return deserializedData;
+        }
 
         public static object GetPropertyValue(object entity, string propertyName)
         {

@@ -5,11 +5,11 @@ VisualStudioVersion = 16.0.30611.23
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LetsGo.DataLayer", "LetsGo.DataLayer\LetsGo.DataLayer.csproj", "{D8A100C0-C596-40F9-A6FD-759B3E6896A6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LetsGo.BackEnd", "LetsGo.BackEnd\LetsGo.BackEnd.csproj", "{BC1D4826-2E9A-41B9-A836-EA1F1D30104C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LetsGo.BackEnd", "LetsGo.BackEnd\LetsGo.BackEnd.csproj", "{BC1D4826-2E9A-41B9-A836-EA1F1D30104C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenericRepositoryCore", "..\..\GenericDatalayer\GenericRepositoryCore\GenericRepositoryCore.csproj", "{752143CA-195A-4F9F-9DBD-9FF3C4371F2D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenericBackEndCore", "..\..\..\..\GenericDatalayer\GenericBackEndCore\GenericBackEndCore.csproj", "{FDCCD021-8BC6-4E80-82D2-1BFAD8116E5B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenericBackEndCore", "..\..\GenericDatalayer\GenericBackEndCore\GenericBackEndCore.csproj", "{BF08C0D9-36E1-4124-AA1A-D2164BBE16D4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenericRepositoryCore", "..\..\..\..\GenericDatalayer\GenericRepositoryCore\GenericRepositoryCore.csproj", "{E057BA61-8174-4005-A7C5-8893F39A016A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,14 +25,14 @@ Global
 		{BC1D4826-2E9A-41B9-A836-EA1F1D30104C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BC1D4826-2E9A-41B9-A836-EA1F1D30104C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BC1D4826-2E9A-41B9-A836-EA1F1D30104C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{752143CA-195A-4F9F-9DBD-9FF3C4371F2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{752143CA-195A-4F9F-9DBD-9FF3C4371F2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{752143CA-195A-4F9F-9DBD-9FF3C4371F2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{752143CA-195A-4F9F-9DBD-9FF3C4371F2D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BF08C0D9-36E1-4124-AA1A-D2164BBE16D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BF08C0D9-36E1-4124-AA1A-D2164BBE16D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BF08C0D9-36E1-4124-AA1A-D2164BBE16D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BF08C0D9-36E1-4124-AA1A-D2164BBE16D4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FDCCD021-8BC6-4E80-82D2-1BFAD8116E5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FDCCD021-8BC6-4E80-82D2-1BFAD8116E5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FDCCD021-8BC6-4E80-82D2-1BFAD8116E5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FDCCD021-8BC6-4E80-82D2-1BFAD8116E5B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E057BA61-8174-4005-A7C5-8893F39A016A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E057BA61-8174-4005-A7C5-8893F39A016A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E057BA61-8174-4005-A7C5-8893F39A016A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E057BA61-8174-4005-A7C5-8893F39A016A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

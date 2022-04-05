@@ -10,8 +10,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\GenericDatalayer\GenericBackEndCore\GenericBackEndCore.csproj" />
-    <ProjectReference Include="..\..\..\GenericDatalayer\GenericRepositoryCore\GenericRepositoryCore.csproj" />
+    <ProjectReference Include="..\..\..\..\..\GenericDatalayer\GenericBackEndCore\GenericBackEndCore.csproj" />
+    <ProjectReference Include="..\..\..\..\..\GenericDatalayer\GenericRepositoryCore\GenericRepositoryCore.csproj" />
     <ProjectReference Include="..\LetsGo.DataLayer\LetsGo.DataLayer.csproj" />
   </ItemGroup>
 

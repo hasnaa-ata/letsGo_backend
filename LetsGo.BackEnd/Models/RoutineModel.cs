@@ -169,4 +169,11 @@ namespace LetsGo.BackEnd.Models
         public List<GroupMember> GroupMembers { get; set; }
         public bool IsGroupRoutine { get; set; }
     }
+
+    public class RoutineAlarm
+    {
+        public List<RoutineDay> AlarmsToDelete { get; set; }
+        public List<RoutineDay> AlarmsToAdd { get; set; }
+        public List<RoutineDay> AlarmsToEdit { get; set; }
+    }
 }

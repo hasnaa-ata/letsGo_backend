@@ -27,6 +27,9 @@ namespace LetsGo.DataLayer.TableEntity
         [Column(Order = 4)]
         public Guid RoutineId { get; set; }
 
+        [Column(Order = 5), Required]
+        public int NotificationId { get; set; }
+
 
         public Routine Routine { get; set; }
     }

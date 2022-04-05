@@ -124,4 +124,9 @@ namespace LetsGo.BackEnd.Models
         public string PhoneNumber { get; set; }
         public string Email { get; set; } 
     }
+
+    public enum InvitationStatus
+    {
+        Pending = 1, Accept = 2, Reject = 3
+    }
 }
